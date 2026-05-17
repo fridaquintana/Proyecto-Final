@@ -1,0 +1,136 @@
+#include <stdio.h>
+
+#define MAX_OYENTES 100
+#define NUM_CANCIONES 10
+
+int leer_votos(int votos[MAX_OYENTES][3]);
+void calcular_canciones_mas_votadas(int votos[MAX_OYENTES][3], int num_oyentes, int *top1, int *top2);
+void calcular_ganador_y_puntos(int votos[MAX_OYENTES][3], int num_oyentes, int top1, int top2);
+
+int main() 
+  {
+    int votos[MAX_OYENTES][3];
+    int num_oyentes = 0;
+    int top1 = -1, top2 = -1;
+
+    printf(" 1. LEER Y ALMACENAR VOTOS \n");
+    num_oyentes = leer_votos(votos);
+
+    if (num_oyentes == 0) 
+        {
+        printf("No se registraron votos.\n");
+        return 0;
+        }
+
+    printf(" 2. CANCIONES MÁS VOTADAS \n");
+    calcular_canciones_mas_votadas(votos, num_oyentes, &top1, &top2);
+
+    printf(" 3.  PUNTOS TOTALES Y GANADOR \n");
+    calcular_ganador_y_puntos(votos, num_oyentes, top1, top2);
+
+    return 0;
+  }
+
+      
+    int leer_votos(int votos[MAX_OYENTES][3]) 
+  {
+    int i = 0;
+    int v1, v2, v3;
+
+    printf("Ingrese las 3 canciones de su eleccion por orden decreciente:\n");
+
+    while (i < MAX_OYENTES) 
+      {
+        
+        if (i == 99) 
+        {
+            printf("Oyente 99 (Límite alcanzado): Asignacion de -1 automáticamente.\n");
+            votos[i][0] = -1;
+            votos[i][1] = 0; 
+            votos[i][2] = 0;
+            break; 
+        }
+
+            printf("Oyente %d: ", i);
+            if (scanf("%d", &v1) != 1 || v1 == -1) 
+          {
+            break; 
+          }
+        
+      
+        scanf("%d %d", &v2, &v3);
+        
+        votos[i][0] = v1;
+        votos[i][1] = v2;
+        votos[i][2] = v3;
+        i++;
+    }
+    return i; 
+    }
+
+
+    void calcular_canciones_mas_votadas(int votos[MAX_OYENTES][3], int num_oyentes, int *top1, int *top2) {
+    int puntuaciones[NUM_CANCIONES] = {0};
+
+    for (int i = 0; i < num_oyentes; i++) {
+        puntuaciones[votos[i][0]] += 3; 
+        puntuaciones[votos[i][1]] += 2; 
+        puntuaciones[votos[i][2]] += 1; 
+    }
+
+    for (int cont = 0; cont < NUM_CANCIONES; cont++) 
+    {
+        printf("Canción %d: %d votos\n", cont, puntuaciones[cont]);
+    }
+
+    int max1 = -1, max2 = -1;
+    for (int c = 0; c < NUM_CANCIONES; c++) {
+        if (puntuaciones[c] > max1) {
+            max2 = max1;
+            *top2 = *top1; // Modificación por referencia corregida
+            max1 = puntuaciones[c];
+            *top1 = c;
+        } 
+          else if (puntuaciones[c] > max2) 
+        {
+            max2 = puntuaciones[c];
+            *top2 = c;
+        }
+    }
+
+    printf("1ª canción: %d\n", *top1);
+    printf("2ª canción: %d\n", *top2);
+}
+
+
+void calcular_ganador_y_puntos(int votos[MAX_OYENTES][3], int num_oyentes, int top1, int top2) 
+     {
+    int max_puntos = -1;
+    int oyente_ganador = -1;
+
+    for (int i = 0; i < num_oyentes; i++) 
+    {
+        int total_top1 = 0;
+        int total_top2 = 0;
+        int puntos_oyente = 0;
+
+        for (int j = 0; j < 3; j++) {
+            if (votos[i][j] == top1) total_top1 = 1;
+            if (votos[i][j] == top2) total_top2 = 1;
+        }
+
+        if (total_top1) puntos_oyente += 30;
+        if (total_top2) puntos_oyente += 20;
+        if (total_top1 && total_top2) puntos_oyente += 10; 
+
+        printf("Oyente %d: %d puntos\n", i, puntos_oyente);
+
+        if (puntos_oyente > max_puntos) {
+            max_puntos = puntos_oyente;
+            oyente_ganador = i;
+        }
+    }
+
+    printf("Ganador: el oyente número %d con %d puntos\n", oyente_ganador, max_puntos);
+}
+
